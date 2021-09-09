@@ -1,0 +1,9 @@
+,event,trial,time,PID,version,phase
+0,fullscreenenter,0,1419,RTY50,V1,full_screen
+1,fullscreenexit,143,291876,RTY50,V1,reward_learning
+2,blur,143,293581,RTY50,V1,reward_learning
+3,focus,143,314005,RTY50,V1,reward_learning
+4,blur,801,1011702,RTY50,V1,memory_test
+5,focus,801,1014479,RTY50,V1,memory_test
+6,blur,801,1015700,RTY50,V1,memory_test
+7,focus,801,1046295,RTY50,V1,memory_test

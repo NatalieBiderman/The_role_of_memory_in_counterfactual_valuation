@@ -1,0 +1,7 @@
+,version,PID,phase,block,trial,stimulus_left,stimulus_right,painting_left,painting_right,rating_left,rating_right,explain_trial,explain_response,novel_left,left_chosen,chosen_obj,unchosen_obj,rt,zscored_rt,delta_ratings,zcored_rating_left,zcored_rating_right,zscored_delta_ratings
+0,V1,RTY50,interference,1.0,0.0,61.0,40.0,Grigb1.jpg,Vinc1n.jpg,50.0,50.0,1.0,,0.0,0.0,40.0,61.0,2.596,-0.07857797446392424,0.0,0.062173232055732414,0.062173232055732414,0.0
+1,V1,RTY50,interference,1.0,1.0,51.0,15.0,Lewic1.jpg,Lassc1.jpg,50.0,50.0,1.0,,0.0,1.0,51.0,15.0,4.436,1.3892745434408595,0.0,0.062173232055732414,-3.5219307335100125,3.5841039655657454
+2,V1,RTY50,interference,1.0,2.0,59.0,27.0,Macka1.jpg,Gustc1.jpg,50.0,50.0,1.0,,0.0,0.0,27.0,59.0,4.01,1.0494347757085558,0.0,0.062173232055732414,0.062173232055732414,0.0
+3,V1,RTY50,interference,1.0,3.0,36.0,16.0,Gustb1.jpg,Vincc1.jpg,50.0,50.0,1.0,,1.0,0.0,16.0,36.0,1.749,-0.7542687802603111,0.0,0.062173232055732414,0.062173232055732414,0.0
+4,V1,RTY50,interference,1.0,4.0,44.0,20.0,Mackb1.jpg,Picb1n.jpg,50.0,50.0,1.0,,1.0,1.0,44.0,20.0,1.402,-1.0310866192347459,0.0,0.062173232055732414,0.062173232055732414,0.0
+5,V1,RTY50,interference,1.0,5.0,65.0,52.0,Roha1n.jpg,Dekoa1.jpg,50.0,50.0,1.0,,1.0,0.0,52.0,65.0,1.974,-0.5747759451904327,0.0,0.062173232055732414,0.062173232055732414,0.0
