@@ -22,7 +22,13 @@ def process_mturk_csv(data_folder, condition_col, version):
         raw_int_data = pd.concat([ pd.read_csv(f) for f in int_data_files ]).assign(version = version)
     else: 
         raw_int_data = []
-        
+    
+    # Add experimental group (sorted by date of experiment) to raw_data 
+    exp_groups = raw_data.loc[raw_data.trial_index==0,["PID","start_time"]].reset_index().drop(columns="index")
+    exp_groups["group"] = exp_groups["start_time"].str.slice(0,9)
+    exp_groups = exp_groups.drop(columns="start_time")
+    raw_data = raw_data.merge(exp_groups, on="PID", how="left")
+
     # turn rt to integer
     raw_data.loc[~np.isnan(raw_data["rt"]),"rt"]=raw_data.loc[~np.isnan(raw_data["rt"]),"rt"].astype(int)/1000
 
@@ -64,7 +70,7 @@ def process_mturk_csv(data_folder, condition_col, version):
     
     # ==== Ratings ====
     
-    ratings_columns = ["version", "PID", "phase", "trial", "stimulus_id", "painting", "rt", "response"]
+    ratings_columns = ["version", "group", "PID", "phase", "trial", "stimulus_id", "painting", "rt", "response"]
     ratings = raw_data.loc[raw_data["category"] == "rating"].reindex(columns = ratings_columns)
     ratings = ratings.reset_index().drop("index", axis=1)
     ratings = ratings.rename(columns = {'response': 'rating'})
@@ -76,16 +82,15 @@ def process_mturk_csv(data_folder, condition_col, version):
     
     # ==== Deliberation ====
     
-    # TODO: make sure "condition" columns is added 
-    deliberation_columns = ["version","PID","phase","block","trial","stimulus_left", "stimulus_right", "painting_left", "painting_right", "rating_left", "rating_right", "explain_trial", "reward_type", "left_chosen", "chosen_obj", "unchosen_obj", "rt"];
+    deliberation_columns = ["version", "group", "PID","phase","block","trial","stimulus_left", "stimulus_right", "painting_left", "painting_right", "rating_left", "rating_right", "explain_trial", "reward_type", "left_chosen", "chosen_obj", "unchosen_obj", "rt"];
     if condition_col: 
         deliberation_columns.insert(3, condition_col)
     deliberation = raw_data.loc[raw_data["category"] == "deliberation"].reindex(columns = deliberation_columns)
     deliberation = deliberation.reset_index().drop("index", axis=1)
     
     # add explain responses
-    deliberation.loc[deliberation.explain_trial==1, "explain_response"] = raw_data.loc[(raw_data.category == "explain_trial") & (raw_data.phase == "deliberation"), "responses"].tolist()
-    deliberation["explain_response"] = deliberation.explain_response.str.replace('{"Q0":','').str.replace('}','').str.replace('"','')
+    #deliberation.loc[deliberation.explain_trial==1, "explain_response"] = raw_data.loc[(raw_data.category == "explain_trial") & (raw_data.phase == "deliberation"), "responses"].tolist()
+    #deliberation["explain_response"] = deliberation.explain_response.str.replace('{"Q0":','').str.replace('}','').str.replace('"','')
 
     # compute zscored rt
     deliberation = compute_zscored_column(deliberation,"rt","zscored_rt")
@@ -99,13 +104,13 @@ def process_mturk_csv(data_folder, condition_col, version):
 
     if 'interference' in pd.unique(raw_data.phase):
         
-        interference_columns = ["version","PID","phase","block","trial","stimulus_left", "stimulus_right", "painting_left", "painting_right", "rating_left", "rating_right", "explain_trial", "explain_response", "novel_left", "left_chosen", "chosen_obj", "unchosen_obj", "rt"];
+        interference_columns = ["version","group", "PID","phase","block","trial","stimulus_left", "stimulus_right", "painting_left", "painting_right", "rating_left", "rating_right", "explain_trial", "explain_response", "novel_left", "left_chosen", "chosen_obj", "unchosen_obj", "rt"];
         interference = raw_data.loc[raw_data["category"] == "interference"].reindex(columns = interference_columns)
         interference = interference.reset_index().drop("index", axis=1)
         
         # add explain responses
-        interference.loc[interference.explain_trial==1, "explain_response"] = raw_data.loc[(raw_data.category == "explain_trial") & (raw_data.phase == "interference"), "responses"].tolist()
-        interference["explain_response"] = interference.explain_response.str.replace('{"Q0":','').str.replace('}','').str.replace('"','')
+        #interference.loc[interference.explain_trial==1, "explain_response"] = raw_data.loc[(raw_data.category == "explain_trial") & (raw_data.phase == "interference"), "responses"].tolist()
+        #interference["explain_response"] = interference.explain_response.str.replace('{"Q0":','').str.replace('}','').str.replace('"','')
 
         # compute zscored rt
         interference = compute_zscored_column(interference,"rt","zscored_rt")
@@ -117,7 +122,7 @@ def process_mturk_csv(data_folder, condition_col, version):
     
     # ==== Reward Learning ====
     
-    reward_columns = ["version","PID","phase","block","trial","stimulus_id","reward_type","reward_amount","see_reward_rt"];
+    reward_columns = ["version","group", "PID","phase","block","trial","stimulus_id","reward_type","reward_amount","see_reward_rt"];
     reward_learning = raw_data.loc[raw_data["category"] == "see_reward"].reindex(columns = reward_columns)
     reward_learning = reward_learning.reset_index().drop("index", axis=1)
     reward_learning = compute_zscored_column(reward_learning,"see_reward_rt","zscored_see_reward_rt")
@@ -132,7 +137,7 @@ def process_mturk_csv(data_folder, condition_col, version):
 
     # ==== Final Decisions ====
     
-    fd_columns = ["version", "PID", "phase", "block", "trial", "chosen_trial", "gain_left", "stimulus_left", "stimulus_right", "painting_left", "painting_right", "rating_left", "rating_right", "left_chosen", "chosen_obj", "unchosen_obj", "higher_outcome_chosen","rt"];
+    fd_columns = ["version", "group", "PID", "phase", "block", "trial", "chosen_trial", "gain_left", "stimulus_left", "stimulus_right", "painting_left", "painting_right", "rating_left", "rating_right", "left_chosen", "chosen_obj", "unchosen_obj", "higher_outcome_chosen","rt"];
     if condition_col: 
         fd_columns.insert(5, condition_col)
 
@@ -149,7 +154,7 @@ def process_mturk_csv(data_folder, condition_col, version):
     
     # ==== Memory ====
     
-    memory_columns = ["version", "PID", "phase", "trial", "old_pair", "stimulus_left", "stimulus_right", "old_response", "rt_pairs", "chosen_object", "left_object_chosen", "rt_object"];
+    memory_columns = ["version", "group", "PID", "phase", "trial", "old_pair", "stimulus_left", "stimulus_right", "old_response", "rt_pairs", "chosen_object", "left_object_chosen", "rt_object"];
     if condition_col: 
         memory_columns.insert(4, condition_col)
 
@@ -193,6 +198,7 @@ def process_mturk_csv(data_folder, condition_col, version):
     memory.to_csv("../Data/Summary_data/all_subs/memory.csv")
     raw_data.to_csv("../Data/Summary_data/all_subs/all_data.csv")
     raw_int_data.to_csv("../Data/Summary_data/all_subs/all_interaction_data.csv")
+    debrief.to_csv("../Data/Summary_data/all_subs/debrief.csv")
 
     
 
@@ -227,10 +233,10 @@ def find_outlier_subs(final_decisions, all_data, all_int_data, blur_focus_criter
          ((all_events.event=="fullscreenenter") & (all_events.n > full_screen_criterion)), 
          ((all_events.event=="fullscreenexit") & (all_events.n > full_screen_criterion)),
          ((all_events.event=="missed_instruction_checkup") & (all_events.n > missed_instructions_criterion)),
-         ((all_events.event=="chosen_pairs_p_gain") & (all_events.n > below_chance_chosen_final_decisions_criterion))))
+         ((all_events.event=="chosen_pairs_p_gain") & (all_events.n < below_chance_chosen_final_decisions_criterion))))
          
                     
-    outlier_subs = pd.DataFrame(np.unique(all_events.PID[all_events.outlier==1]))
+    outlier_subs = np.unique(all_events.PID[all_events.outlier==1])
     
     # return warnings mat 
     return all_events, outlier_subs
@@ -238,7 +244,7 @@ def find_outlier_subs(final_decisions, all_data, all_int_data, blur_focus_criter
 def remove_outlier_subs(outliers, df, df_name):        
         
     # remove outliers from df
-    df = df[~df["PID"].isin(list(outliers))]
+    df = df[~df["PID"].isin(outliers)]
     
     # save new df 
     df.to_csv("../Data/Summary_data/non_outlier_subs/" + df_name + ".csv")
