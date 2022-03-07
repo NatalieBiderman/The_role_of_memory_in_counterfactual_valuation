@@ -40,7 +40,7 @@ rm(list=ls(all=TRUE))
 knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
 
 # If packages are not installed, install. Then, load libraries. 
-list_of_packages <- c("ggplot2", "Rmisc", "cowplot", "reshape2", "gridExtra", "arm", "mosaic", "stringr", "tidyr", "dplyr", "bayesplot", "rstanarm", "latex2exp", "kableExtra")
+list_of_packages <- c("ggplot2", "cowplot",  "tidyr", "dplyr", "rstanarm", "kableExtra", "stringr")
 new_packages <- list_of_packages[!(list_of_packages %in% installed.packages()[,"Package"])]
 if(length(new_packages)) install.packages(new_packages)
 lapply(list_of_packages, require, character.only = TRUE)
@@ -142,7 +142,7 @@ bonus <- dfs$all_data_all_subs %>%
   dplyr::select(Exp, `total bonus`, `deliberation bonus`)
 
 # bind all details
-demographics_total <- join(join(demographics, outliers, by="Exp"), bonus, by="Exp") %>%
+demographics_total <- merge(merge(demographics, outliers, by="Exp"), bonus, by="Exp") %>%
   mutate(Exp = case_when(Exp=="Pilot" ~ "Pilot",
                          Exp=="Exp1" ~ "Experiment 1")) %>%
   mutate(Exp = factor(Exp, levels = c("Pilot", "Experiment 1"))) %>%
@@ -248,7 +248,7 @@ create_summary_coefs_memory <- function(M, Exp){
     dplyr::select(coef, value) %>%
     mutate(Exp = Exp) %>%
     rename(Coefficient = coef, Value = value, Experiment = Exp) %>%
-    select(Experiment, Coefficient, Value)
+    dplyr::select(Experiment, Coefficient, Value)
 
   sum_coefs[[sprintf("M_memory_draws_%s",Exp)]] <- draws_M
   sum_coefs[[sprintf("summary_coefs_memory_%s",Exp)]] <- summary_coefs
@@ -425,7 +425,7 @@ RT_FD_group <- RT_FD %>%
                    se_zrt = sd(zscored_rt)/sqrt(n())) %>%
   mutate(RT = sprintf("%.2f \u00b1 %.2f", mean_rt, se_rt),
          `Normalized RT` = sprintf("%.2f \u00b1 %.2f", mean_zrt, se_zrt)) %>%
-  select(Exp, Choice, Condition, `Chosen item`, RT, `Normalized RT`) 
+  dplyr::select(Exp, Choice, Condition, `Chosen item`, RT, `Normalized RT`) 
 
 RT_FD_group %>%
   kbl(caption = "Behavioral means") %>%
@@ -497,7 +497,7 @@ create_summary_coefs_rt_choice_model <- function(M, Exp){
     dplyr::select(coef, value) %>%
     mutate(Exp = Exp) %>%
     rename(Coefficient = coef, Value = value, Experiment = Exp) %>%
-    select(Experiment, Coefficient, Value)
+    dplyr::select(Experiment, Coefficient, Value)
 
   sum_coefs[[sprintf("M_zscored_RT_gain_cond_FD_draws_%s",Exp)]] <- M_draws
   sum_coefs[[sprintf("summary_coefs_rt_choice_%s",Exp)]] <- summary_coefs
@@ -628,7 +628,7 @@ create_summary_coefs_memory_bias <- function(M, Exp){
     dplyr::select(coef, value) %>%
     mutate(Exp = Exp) %>%
     rename(Coefficient = coef, Value = value, Experiment = Exp) %>%
-    select(Experiment, Coefficient, Value)
+    dplyr::select(Experiment, Coefficient, Value)
 
   sum_coefs[[sprintf("M_memory_bias_draws_%s",Exp)]] <- M_draws
   sum_coefs[[sprintf("summary_coefs_memory_bias_%s",Exp)]] <- summary_coefs
@@ -659,9 +659,9 @@ print_list_memory_bias[[2]]
 pairs_acc$Condition <- factor(pairs_acc$Condition,levels = c("Repetition", "Interference"))
 
 p1 <- ggplot(subset(pairs_acc, Exp=="Exp1"), aes(x=Condition,y=pairs_acc,group=Condition)) +
-  stat_summary_bin(aes(y=pairs_acc, fill=Condition), fun="mean", geom="bar", binwidth=0.2, position=position_dodge(width=1), alpha=0.7) +
+  stat_summary_bin(aes(y=pairs_acc, fill=Condition), fun="mean", geom="bar", binwidth=0.2, position=position_dodge(width=1)) +
   geom_point(aes(color=Condition), position=position_jitterdodge(dodge.width=1, jitter.width=0.2, jitter.height=0.005), 
-                   fill="white", shape=21, stroke=point_stroke, size=point_size-2) +
+                   fill="white", shape=21, stroke=point_stroke-0.3, size=point_size-2) +
   #scale_color_manual(values="black") + 
   stat_summary(aes(color=Condition),fun.data=mean_se, fun.args = list(mult=n_sem), geom="errorbar", width=0.3, size=0.9, 
                position=position_nudge(0.2)) + # "turquoise4"
@@ -688,9 +688,9 @@ bias <- subset(dfs$final_decisions, Exp=="Exp1") %>%
   mutate(Condition = factor(Condition,levels = c("Repetition", "Interference")))
 
 p2 <- ggplot(bias, aes(x=Choice,y=p_gain,group=Condition)) +
-  stat_summary_bin(aes(y=p_gain, fill=Condition), fun="mean", geom="bar", binwidth=0.2, position=position_dodge(width=1), alpha=0.7) +
+  stat_summary_bin(aes(y=p_gain, fill=Condition), fun="mean", geom="bar", binwidth=0.2, position=position_dodge(width=1)) +
   geom_point(aes(color=Condition), position=position_jitterdodge(dodge.width=1, jitter.width=0.1), 
-                   fill="white", shape=21, stroke=point_stroke, size=point_size-2) +
+                   fill="white", shape=21, stroke=point_stroke-0.3, size=point_size-2) +
   #scale_color_manual(values="black") + 
   stat_summary(aes(color=Condition),fun.data=mean_se, fun.args = list(mult=n_sem), geom="errorbar", width=0.3, size=0.9, position=position_dodge(1)) + # "turquoise4"
   geom_hline(yintercept=0.5, size=line_size, linetype="dashed") + 
@@ -743,7 +743,7 @@ p3 <- ggplot(subset(memory_bias_Exp1, condition!="diff"), aes(y=inverse_bias,x=p
   theme + 
   point_plot_theme +
   geom_ribbon(data = predicted_draws_memory_bias, 
-              aes(ymin=lower, ymax=upper, fill=condition), color=NA, alpha=0.5) + 
+              aes(ymin=lower, ymax=upper, fill=condition), color=NA) + 
   geom_line(data=predicted_draws_memory_bias, aes(y=median, color=condition), size=line_size*1.5) +  
   geom_hline(yintercept=0, size=line_size, linetype="dashed") + 
   geom_vline(xintercept=0.5, size=line_size,  linetype="dashed") +
@@ -948,7 +948,7 @@ print_list_outcome_estimation[[1]]
 # ==========================================================================
 
 inverse_decision_estimation <- outcome_estimation %>% 
-  select(-c(eval_acc, eval_rt)) %>%
+  dplyr::select(-c(eval_acc, eval_rt)) %>%
   spread(Outcome, gain_eval) %>%
   mutate(reward_diff = Rewarded-Unrewarded) %>%
   merge(subset(p_gain, Exp=="Exp1") %>% rename(Condition=condition, Choice=choice), by=c("PID","Choice", "Condition")) %>%
@@ -1018,7 +1018,7 @@ n_inverse_strategy <- dfs$debrief %>%
   summarize(n = n()) %>%
   spread(Strategy, n) %>%
   mutate(text = sprintf("there are %d subs with the inverse strategy, which are %.2f percent out of total n", `1`, `1`/(`1`+`<NA>`)*100)) %>%
-  select(Exp, text)
+  dplyr::select(Exp, text)
 
 n_inverse_strategy %>%
   kbl(caption = "Percent of paricipants who reported using an inverse strategy") %>%
@@ -1214,7 +1214,7 @@ RT_FD_strategy <- RT_FD %>%
   dplyr::summarise(mean = mean(rt, na.rm=1),
                    se = sd(rt)/sqrt(n())) %>%
   mutate(RT = sprintf("%.2f \u00b1 %.2f", mean, se)) %>%
-  select(Exp, Strategy, Choice, Condition, `Chosen item`, RT) 
+  dplyr::select(Exp, Strategy, Choice, Condition, `Chosen item`, RT) 
 
 RT_FD_strategy %>%
   kbl(caption = "Reaction times in the Final Decisions phase as a function of inverse strategy") %>%
@@ -1358,7 +1358,7 @@ bias <- p_gain_group %>%
          `Unchosen pairs (p(select S+))` = Unchosen) 
   
 memory <- pairs_acc_group %>%
-  select(-c(`Normalized RTs`)) %>%
+  dplyr::select(-c(`Normalized RTs`)) %>%
   rename(`Pairs memory accuracy` = Accuracy)
 
 means <- bias %>%

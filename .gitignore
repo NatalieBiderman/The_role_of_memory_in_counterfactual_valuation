@@ -1,2 +1,11 @@
-Interference_exp/Data/Pilot/Models
 Interference_exp/Data/Exp1/Models
+Interference_exp/Data/Pilot/Models
+
+Interference_exp/Data/Exp1/Summary_data/non_outlier_subs/all_data.csv
+Interference_exp/Data/Pilot/Summary_data/non_outlier_subs/all_data.csv
+
+Interference_exp/Data/Exp1/Summary_data/all_subs/all_data.csv
+Interference_exp/Data/Pilot/Summary_data/all_subs/all_data.csv
+
+Interference_exp/Analysis/habanero_models
+Interference_exp/Analysis/old
