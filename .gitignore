@@ -1,0 +1,17 @@
+Data/Exp1/Models
+Data/Pilot/Models
+
+Data/Exp1/Summary_data/non_outlier_subs/all_data.csv
+Data/Pilot/Summary_data/non_outlier_subs/all_data.csv
+
+Data/Exp1/Summary_data/all_subs/all_data.csv
+Data/Pilot/Summary_data/all_subs/all_data.csv
+
+Analysis/habanero_models
+Analysis/old
+
+Policy_gradient_model/old
+Policy_gradient_model/python_script
+
+Preregistration
+
