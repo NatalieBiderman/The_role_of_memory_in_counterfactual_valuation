@@ -1,6 +1,6 @@
 ---
 title: "Analysis code"
-subtitle: "The role of memory in the inverse decision bias"
+subtitle: "The role of memory in counterfactual valuation"
 author: "Natalie Biderman"
 date: "02/16/2021"
 output: 
