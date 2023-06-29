@@ -36,8 +36,6 @@ function [results, bms_results] = fit_models(data)
         end
         
         % model comparison
-        %lme = lme - log(K);
-        %bms_results.lme = lme;
         [bms_results.alpha,bms_results.exp_r,bms_results.xp,bms_results.pxp,bms_results.bor,bms_results.g] = bms(lik_pred);
         bms_results.lik_pred = lik_pred;
         

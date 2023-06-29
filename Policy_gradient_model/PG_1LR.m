@@ -24,9 +24,11 @@ function [p1, p2] = PG_1LR(x,data,model)
     
     % outcome phase
     V = mean(data.reward);
-    grad_chosen = (data.reward - V).*beta.*p1.*(1-p1);
-    theta_chosen = theta_chosen + alpha_chosen.*grad_chosen;
-    theta_unchosen = theta_unchosen - alpha_unchosen.*grad_chosen.*mem_unchosen;
+%     grad_chosen = (data.reward - V).*beta.*p1.*(1-p1);
+%     theta_chosen = theta_chosen + alpha_chosen.*grad_chosen;
+%     theta_unchosen = theta_unchosen - alpha_unchosen.*grad_chosen.*mem_unchosen;
+    theta_chosen = theta_chosen + alpha_chosen.*(data.reward - V).*beta.*(1-p1);
+    theta_unchosen = theta_unchosen - alpha_unchosen.*(data.reward - V).*beta.*p1.*mem_unchosen;
     
     % final choice probabilities
     p2 = zeros(size(data.chosen_pair,1),size(x,1));
